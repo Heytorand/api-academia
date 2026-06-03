@@ -1,15 +1,23 @@
-// ============================================================
-// 🎯 TAREFA: Crie o middleware de erro com 4 parâmetros!
-// ============================================================
-//
-// import { Request, Response, NextFunction } from "express";
-// import { AppError, ValidationError } from "../errors";
-//
-// 1. Se err instanceof ValidationError → 400 + erros[]
-// 2. Se err instanceof AppError → statusCode + mensagem
-// 3. Senão → console.error + 500
-//
-// ⚠️ ValidationError ANTES de AppError nos instanceof!
-// ⚠️ NUNCA enviar err.stack na resposta!
-// ============================================================
+import { Request, Response, NextFunction } from "express";
+import { AppError } from "../errors";
 
+export function errorHandler(
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  if (err instanceof AppError) {
+    return res.status(err.statusCode).json({
+      sucesso: false,
+      erro: err.message,
+    });
+  }
+
+  console.error(err);
+
+  return res.status(500).json({
+    sucesso: false,
+    erro: "Erro interno do servidor",
+  });
+}
